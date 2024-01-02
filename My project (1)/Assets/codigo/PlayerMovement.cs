@@ -1,88 +1,62 @@
 using UnityEngine;
-
 public class PlayerMovement : MonoBehaviour
 {
-    public float caminarSpeed = 8.0f;
-    public float CorrerSpeed = 12.0f;
-    public float RotationSpeed = 100.0f;
-    public float fuerzaSalto = 5.0f;
-    public float maxLookUpAngle = 80.0f;
-    public float maxLookDownAngle = 80.0f;
-    private Rigidbody fisicas;
-    private float currentRotationX = 0.0f;
-    private bool hasJumped = false;
+    [Header("Movement")]
+    private float moveSpeed;
 
-    private readonly float StandingHeight = 1.0f;
-    private readonly float CrouchingHeight = 0.7f;
-    private bool isCrouching = false;
+    public float groundDrag;
 
-    // Start is called before the first frame update
-    void Start()
+    [Header("Ground Check")]
+    public float playerHeight;
+    public LayerMask whatIsGround;
+    bool grounded;
+    public Transform orientation;
+    float horizontalInput;
+    float verticalInput;
+
+    Vector3 moveDirection;
+
+    Rigidbody rb;
+
+    private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
-        fisicas = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
+        rb.freezeRotation = true;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        // Movimiento
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
+        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * .5f + .2f, whatIsGround);
+        MyInput();
 
-        // Sprint
-        float speed = Input.GetKey(KeyCode.LeftShift) ? CorrerSpeed : caminarSpeed;
+        if (grounded) rb.drag = groundDrag;
+        else rb.drag = 0;
 
-        transform.Translate(speed * Time.deltaTime * new Vector3(horizontal, 0.0f, vertical));
-
-        // Rotacion
-        float rotationY = Input.GetAxis("Mouse X");
-        transform.Rotate(new Vector3(0, rotationY * Time.deltaTime * RotationSpeed, 0));
-
-        // Rotacion de la cámara arriba y abajo
-        float rotationX = -Input.GetAxis("Mouse Y");
-        currentRotationX += rotationX * Time.deltaTime * RotationSpeed;
-        currentRotationX = Mathf.Clamp(currentRotationX, -maxLookUpAngle, maxLookDownAngle);
-
-        Camera.main.transform.localRotation = Quaternion.Euler(currentRotationX, 0, 0);
-
-        // Salto
-        if (Input.GetKeyDown(KeyCode.Space) && !hasJumped)
+        if (Input.GetKey(KeyCode.LeftShift)) // Change GetKeyDown to GetKey
         {
-            fisicas.AddForce(new Vector3(0, fuerzaSalto, 0), ForceMode.Impulse);
-            hasJumped = true;
+            moveSpeed = 4.5f;
+        }
+        else
+        {
+            moveSpeed = 2.5f;
         }
 
-        // Agacharse
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            if (isCrouching) { StandUp(); }
-            else { Crouch(); }
-
-            void Crouch()
-            {
-                isCrouching = true;
-                transform.localScale = new Vector3(transform.localScale.x, CrouchingHeight, transform.localScale.z);
-                fisicas.AddForce(new Vector3(0, -1.5f, 0), ForceMode.Impulse);
-                // Aquí se agacha y se cambia la posicion del jugador para evitar la caida del mono fake
-            }
-            void StandUp()
-            {
-                isCrouching = false;
-                transform.localScale = new Vector3(transform.localScale.x, StandingHeight, transform.localScale.z);
-                // Aquí también podrías cambiar la posición del personaje para que parezca que se está levantando
-            }
-        }
     }
 
-    // Verificar si el jugador está en el suelo
-    private void OnCollisionEnter(Collision collision)
+    private void FixedUpdate()
     {
-        if (collision.gameObject.CompareTag("ground"))
-        {
-            hasJumped = false; // Restablecer la bandera cuando toca el suelo
-        }
+        MovePlayer();
     }
+    private void MyInput()
+    {
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+        verticalInput = Input.GetAxisRaw("Vertical");
+    }
+
+    private void MovePlayer()
+    {
+        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+        rb.AddForce(10f * moveSpeed * moveDirection.normalized, ForceMode.Force);
+    }
+
 }
