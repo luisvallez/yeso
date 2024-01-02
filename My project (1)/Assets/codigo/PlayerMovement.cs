@@ -12,8 +12,8 @@ public class PlayerMovement : MonoBehaviour
     private float currentRotationX = 0.0f;
     private bool hasJumped = false;
 
-    private float StandingHeight = 1.0f;
-    private float CrouchingHeight = 0.7f;
+    private readonly float StandingHeight = 1.0f;
+    private readonly float CrouchingHeight = 0.7f;
     private bool isCrouching = false;
 
     // Start is called before the first frame update
@@ -37,7 +37,6 @@ public class PlayerMovement : MonoBehaviour
 
         transform.Translate(speed * Time.deltaTime * new Vector3(horizontal, 0.0f, vertical));
 
-
         // Rotacion
         float rotationY = Input.GetAxis("Mouse X");
         transform.Rotate(new Vector3(0, rotationY * Time.deltaTime * RotationSpeed, 0));
@@ -59,21 +58,15 @@ public class PlayerMovement : MonoBehaviour
         // Agacharse
         if (Input.GetKeyDown(KeyCode.C))
         {
-            if (isCrouching)
-            {
-                StandUp();
-            }
-            else
-            {
-                Crouch();
-            }
+            if (isCrouching) { StandUp(); }
+            else { Crouch(); }
 
             void Crouch()
             {
                 isCrouching = true;
                 transform.localScale = new Vector3(transform.localScale.x, CrouchingHeight, transform.localScale.z);
                 fisicas.AddForce(new Vector3(0, -1.5f, 0), ForceMode.Impulse);
-                // Aquí también podrías cambiar la posición del personaje para que parezca que se está agachando
+                // Aquí se agacha y se cambia la posicion del jugador para evitar la caida del mono fake
             }
             void StandUp()
             {
@@ -82,12 +75,7 @@ public class PlayerMovement : MonoBehaviour
                 // Aquí también podrías cambiar la posición del personaje para que parezca que se está levantando
             }
         }
-
-
     }
-
-
-
 
     // Verificar si el jugador está en el suelo
     private void OnCollisionEnter(Collision collision)
