@@ -1,19 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float WalkSpeed = 8.0f;
-    public float SprintSpeed = 12.0f;
+    public float caminarSpeed = 8.0f;
+    public float CorrerSpeed = 12.0f;
     public float RotationSpeed = 100.0f;
-    public float JumpForce = 5.0f;
-    public float maxLookUpAngle = 80.0f; 
+    public float fuerzaSalto = 5.0f;
+    public float maxLookUpAngle = 80.0f;
     public float maxLookDownAngle = 80.0f;
-
-    private Rigidbody Physics;
+    private Rigidbody fisicas;
     private float currentRotationX = 0.0f;
     private bool hasJumped = false;
+
+    private float StandingHeight = 1.0f;
+    private float CrouchingHeight = 0.7f;
+    private bool isCrouching = false;
 
     // Start is called before the first frame update
     void Start()
@@ -21,7 +22,7 @@ public class PlayerMovement : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        Physics = GetComponent<Rigidbody>();
+        fisicas = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -32,9 +33,10 @@ public class PlayerMovement : MonoBehaviour
         float vertical = Input.GetAxis("Vertical");
 
         // Sprint
-        float speed = Input.GetKey(KeyCode.LeftShift) ? SprintSpeed : WalkSpeed;
+        float speed = Input.GetKey(KeyCode.LeftShift) ? CorrerSpeed : caminarSpeed;
 
-        transform.Translate(new Vector3(horizontal, 0.0f, vertical) * Time.deltaTime * speed);
+        transform.Translate(speed * Time.deltaTime * new Vector3(horizontal, 0.0f, vertical));
+
 
         // Rotacion
         float rotationY = Input.GetAxis("Mouse X");
@@ -50,10 +52,42 @@ public class PlayerMovement : MonoBehaviour
         // Salto
         if (Input.GetKeyDown(KeyCode.Space) && !hasJumped)
         {
-            Physics.AddForce(new Vector3(0, JumpForce, 0), ForceMode.Impulse);
+            fisicas.AddForce(new Vector3(0, fuerzaSalto, 0), ForceMode.Impulse);
             hasJumped = true;
         }
+
+        // Agacharse
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            if (isCrouching)
+            {
+                StandUp();
+            }
+            else
+            {
+                Crouch();
+            }
+
+            void Crouch()
+            {
+                isCrouching = true;
+                transform.localScale = new Vector3(transform.localScale.x, CrouchingHeight, transform.localScale.z);
+                fisicas.AddForce(new Vector3(0, -1.5f, 0), ForceMode.Impulse);
+                // Aquí también podrías cambiar la posición del personaje para que parezca que se está agachando
+            }
+            void StandUp()
+            {
+                isCrouching = false;
+                transform.localScale = new Vector3(transform.localScale.x, StandingHeight, transform.localScale.z);
+                // Aquí también podrías cambiar la posición del personaje para que parezca que se está levantando
+            }
+        }
+
+
     }
+
+
+
 
     // Verificar si el jugador está en el suelo
     private void OnCollisionEnter(Collision collision)
