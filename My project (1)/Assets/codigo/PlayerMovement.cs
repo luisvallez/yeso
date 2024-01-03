@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
-    private float moveSpeed;
+    public float moveSpeed;
 
     public float groundDrag;
 
@@ -15,10 +15,6 @@ public class PlayerMovement : MonoBehaviour
     float horizontalInput;
     float verticalInput;
 
-    [Header("Health")]
-    public float maxHealth = 100f;
-    private float currentHealth;
-
     Vector3 moveDirection;
 
     Rigidbody rb;
@@ -27,6 +23,7 @@ public class PlayerMovement : MonoBehaviour
     float standingHeight; // Guarda la altura original del jugador en posición de pie
     float crouchingHeight; // Altura cuando está agachado
     float jumpForce; // Fuerza aplicada al saltar
+    Vector3 respawnPoint; // Punto de respawn
 
     private void Start()
     {
@@ -37,7 +34,8 @@ public class PlayerMovement : MonoBehaviour
         crouchingHeight = standingHeight * 0.2f; // Calcula la altura cuando está agachado
         jumpForce = Mathf.Sqrt(-2 * Physics.gravity.y * (standingHeight * 0.5f)); // Fuerza para alcanzar la mitad de la altura original
 
-        currentHealth = maxHealth; // Inicializar la salud al valor máximo al principio del juego
+        // Guarda el punto de respawn al inicio
+        respawnPoint = transform.position;
     }
 
     private void Update()
@@ -79,6 +77,12 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             StandUp();
+        }
+
+        // Verifica si el jugador ha caído por debajo de la altura -10 y realiza el respawn
+        if (transform.position.y < -10)
+        {
+            Respawn();
         }
     }
 
@@ -125,22 +129,10 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Función para recibir daño
-    public void TakeDamage(float damageAmount)
+    private void Respawn()
     {
-        currentHealth -= damageAmount;
-
-        // Verificar si el jugador murió
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
-    }
-
-    private void Die()
-    {
-        // Aquí puedes agregar lógica para manejar la muerte del jugador
-        Debug.Log("Player died!");
-        // Por ejemplo, puedes reiniciar el nivel o mostrar un mensaje de Game Over.
+        // Teletransporta al jugador al punto de respawn
+        transform.position = respawnPoint;
+        rb.velocity = Vector3.zero; // Detiene la velocidad del jugador
     }
 }
