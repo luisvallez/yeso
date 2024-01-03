@@ -47,11 +47,13 @@ public class PlayerMovement : MonoBehaviour
         if (grounded)
         {
             rb.drag = groundDrag;
-            canJump = true; // Restablecer canJump cuando toca el suelo
+            canJump = true;
         }
         else
         {
             rb.drag = 0;
+            // Restablecer canJump cuando toca el suelo
+
         }
 
         if (Input.GetKey(KeyCode.LeftShift))
