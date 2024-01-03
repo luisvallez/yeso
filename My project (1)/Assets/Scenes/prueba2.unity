@@ -818,6 +818,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bc10a5b19f788a4b9dd7797f78fe11d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 0
   groundDrag: 5
   playerHeight: 2
   whatIsGround:

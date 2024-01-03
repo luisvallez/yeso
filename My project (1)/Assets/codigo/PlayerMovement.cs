@@ -33,9 +33,28 @@ public class PlayerMovement : MonoBehaviour
         standingHeight = playerHeight; // Guarda la altura original al inicio
         crouchingHeight = standingHeight * 0.2f; // Calcula la altura cuando está agachado
         jumpForce = Mathf.Sqrt(-2 * Physics.gravity.y * (standingHeight * 0.5f)); // Fuerza para alcanzar la mitad de la altura original
-
         // Guarda el punto de respawn al inicio
         respawnPoint = transform.position;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        // Comprueba si el jugador está en contacto con el suelo
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            grounded = true;
+            canJump = true;
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        // Comprueba si el jugador ya no está en contacto con el suelo
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            grounded = false;
+            canJump = false;
+        }
     }
 
     private void Update()
@@ -52,6 +71,7 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             rb.drag = 0;
+            canJump = false;
             // Restablecer canJump cuando toca el suelo
 
         }
@@ -107,7 +127,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
-        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        rb.AddForce(Vector3.up * 10, ForceMode.Impulse);
         canJump = false;
     }
 
