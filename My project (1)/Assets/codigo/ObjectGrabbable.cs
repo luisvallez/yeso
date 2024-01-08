@@ -41,15 +41,4 @@ public class ObjectGrabbable : MonoBehaviour
             objectRB.MoveRotation(newRotation);
         }
     }
-
-    // En tu script ObjectGrabbable
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("NoColisionar"))
-        {
-            Physics.IgnoreCollision(objectCollider, collision.collider);
-        }
-    }
-
-
 }
