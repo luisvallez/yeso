@@ -103,7 +103,6 @@ MonoBehaviour:
   rb: {fileID: 9165468820265256334}
   anim: {fileID: 978637850819849860}
   camHolder: {fileID: 5532036824052065573}
-  grounded: 0
 --- !u!114 &7314844381324139838
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -375,7 +374,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 80
   orthographic: 0
